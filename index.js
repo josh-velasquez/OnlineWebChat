@@ -39,16 +39,20 @@ const updateUserName = (currentUsername, newName) => {
 
 const updateUserColor = (username, newColor) => {
   for (var i = 0; i < currentUsers.length; i++) {
-    if (currentUsers[i].username == currentUsername) {
+    if (currentUsers[i].username == username) {
       currentUsers[i].color = newColor;
     }
   }
 };
 
 io.on("connection", function(socket) {
-  socket.on("change username", function(data) {
-    // check if user name already exist here
+  socket.on("change user color", function(data) {
+    updateUserColor(data.username, data.newcolor);
+  });
+});
 
+io.on("connection", function(socket) {
+  socket.on("change username", function(data) {
     updateUserName(data.username, data.newusername);
     updateCurrentOnlineUsers();
   });

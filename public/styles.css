@@ -8,7 +8,6 @@ body {
   background-color: rgb(59, 59, 59);
   display: flex;
   flex-direction: row;
-  overflow: hidden;
 }
 form {
   padding: 3px;
@@ -54,11 +53,6 @@ form button {
   color: black;
 }
 
-#messages-box {
-  /* overflow: scroll; */
-  height: 80%;
-}
-
 #users {
   list-style-type: none;
   color: aliceblue;
@@ -67,6 +61,7 @@ form button {
 }
 .chat {
   width: 80%;
+  background-color: black; 
   padding: 10px 10px;
 }
 
@@ -74,11 +69,14 @@ form button {
   background-color: rgb(49, 49, 49);
   padding: 3px;
   position: fixed;
-
   right: 0;
   height: 100%;
   width: 20%;
   border-radius: 3px;
+}
+
+#users-list {
+  /* reverse here */
 }
 
 .online-users h1 {

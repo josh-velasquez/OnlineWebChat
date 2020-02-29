@@ -5,9 +5,9 @@ $(function() {
   $("form").submit(function(e) {
     e.preventDefault();
     var input = $("#m").val();
-    if (input.includes("/nick")) {
+    if (input.includes("/nick ")) {
       changeUserName(input);
-    } else if (input.includes("/nickcolor")) {
+    } else if (input.includes("/nickcolor ")) {
       changeUserColor(input);
     } else {
       newMessage(input);
@@ -22,16 +22,18 @@ $(function() {
 
   socket.on("new user connection", function(newUser) {
     user = newUser.username;
+    var newUser = "You are: " + user;
+    var li = '<li style="font-weight: bold; text-align: center;">';
+    $("#messages").append($(li).text(newUser));
   });
 
   socket.on("update current online users", function(users) {
     $("#users").empty();
-
+    let li;
     for (var i = 0; i < users.length; i++) {
-      $("#users").append($("<li>").text(users[i].username));
-      //   style = '<li style="color: rgb' + users[i].color + ';font-weight: bold;"';
-      //   console.log(style);
-      //   $("#users").append($(style).text(users[i].username));
+      console.log(users[i].color);
+      li = '<li style="color: rgb' + users[i].color + ';">';
+      $("#users").append($(li).text(users[i].username));
     }
   });
 
@@ -45,10 +47,10 @@ $(function() {
   const changeUserName = data => {
     var newName = data.slice(6, data.length);
     socket.emit("change username", {
-      username: data.username,
-      time: getCurrentTime(),
+      username: user,
       newusername: newName
     });
+    user = newName;
   };
 
   const changeUserColor = data => {
@@ -56,7 +58,6 @@ $(function() {
     // PARSE DATA HERE... IT WILL BE IN THE FROM /nickcolor <color>
     socket.emit("change user color", {
       username: user,
-      time: getCurrentTime(),
       newcolor: newColor
     });
   };
