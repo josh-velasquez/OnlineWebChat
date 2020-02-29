@@ -60,9 +60,19 @@ form button {
   text-align: center;
 }
 .chat {
+  overflow: none;
+  position: relative;
   width: 80%;
-  background-color: black; 
-  padding: 10px 10px;
+  height: 800px;
+}
+
+#chat-box {
+  overflow: auto;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  margin-bottom: 40px;
+  max-height: 800px;
 }
 
 .online-users {
@@ -83,4 +93,8 @@ form button {
   color: whitesmoke;
   text-align: center;
   padding-top: 15px;
+}
+
+.online-users li {
+  padding-top: 10px;
 }

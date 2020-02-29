@@ -1,6 +1,8 @@
 $(function() {
   var socket = io();
-  var user = null;
+  var liveUser = { username: "", color: "" };
+
+  $("#chat").scrollTop($("#chat-box")[0].scrollHeight);
 
   $("form").submit(function(e) {
     e.preventDefault();
@@ -16,22 +18,24 @@ $(function() {
     return false;
   });
 
-  socket.on("chat message", function(msg) {
-    $("#messages").append($("<li>").text(msg));
+  socket.on("new user connection", function(newUser) {
+    var li = '<li style="font-weight: bold; text-align: center; color: red">';
+    $("#messages").append(
+      $(li).text("New user joined the chat: " + newUser.username)
+    );
   });
 
-  socket.on("new user connection", function(newUser) {
-    user = newUser.username;
-    var newUser = "You are: " + user;
-    var li = '<li style="font-weight: bold; text-align: center;">';
-    $("#messages").append($(li).text(newUser));
+  // ###############################################
+
+  socket.on("chat message", function(msg) {
+    var li = '<li style="color: rgb' + msg.color + ';">';
+    $("#messages").append($(li).text(msg.message));
   });
 
   socket.on("update current online users", function(users) {
     $("#users").empty();
     let li;
     for (var i = 0; i < users.length; i++) {
-      console.log(users[i].color);
       li = '<li style="color: rgb' + users[i].color + ';">';
       $("#users").append($(li).text(users[i].username));
     }
@@ -47,24 +51,32 @@ $(function() {
   const changeUserName = data => {
     var newName = data.slice(6, data.length);
     socket.emit("change username", {
-      username: user,
+      username: liveUser.username,
       newusername: newName
     });
-    user = newName;
+    var message =
+      "User " + liveUser.username + " updated their name to " + newName;
+    var li = '<li style="font-weight: bold; text-align: center;">';
+    $("#messages").append($(li).text(message));
+    liveUser.username = newName;
   };
 
   const changeUserColor = data => {
-    var newColor = data.slice(10, data.length);
-    // PARSE DATA HERE... IT WILL BE IN THE FROM /nickcolor <color>
+    var newColor = data.slice(11, data.length);
     socket.emit("change user color", {
-      username: user,
+      username: liveUser.username,
       newcolor: newColor
     });
+    var message = "Successfully changed your colour to: " + newColor;
+    var li = '<li style="font-weight: bold; text-align: center;">';
+    $("#messages").append($(li).text(message));
+    liveUser.color = newColor;
   };
 
   const newMessage = data => {
     socket.emit("chat message", {
-      username: user,
+      username: liveUser.username,
+      color: liveUser.color,
       time: getCurrentTime(),
       message: data
     });

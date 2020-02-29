@@ -11,15 +11,6 @@ var currentUsers = [];
 var messages = [];
 var numUsers = 0;
 
-const newUserConnection = () => {
-  numUsers += 1;
-  var newUser = { username: "User" + numUsers, color: (255, 255, 255) };
-  currentUsers.push(newUser);
-  io.emit("new user connection", newUser);
-  updateCurrentOnlineUsers();
-};
-
-// When a new user connects
 io.on("connection", function(socket) {
   console.log("a user connected");
   newUserConnection();
@@ -28,6 +19,20 @@ io.on("connection", function(socket) {
     updateCurrentOnlineUsers();
   });
 });
+
+const newUserConnection = () => {
+  numUsers += 1;
+  var newUser = { username: "User" + numUsers, color: "(255, 255, 255)" };
+  currentUsers.push(newUser);
+  io.emit("new user connection", newUser);
+  updateCurrentOnlineUsers();
+};
+
+const updateCurrentOnlineUsers = () => {
+  io.emit("update current online users", currentUsers);
+};
+
+// ###############################################
 
 const updateUserName = (currentUsername, newName) => {
   for (var i = 0; i < currentUsers.length; i++) {
@@ -48,6 +53,7 @@ const updateUserColor = (username, newColor) => {
 io.on("connection", function(socket) {
   socket.on("change user color", function(data) {
     updateUserColor(data.username, data.newcolor);
+    updateCurrentOnlineUsers();
   });
 });
 
@@ -58,15 +64,11 @@ io.on("connection", function(socket) {
   });
 });
 
-const updateCurrentOnlineUsers = () => {
-  io.emit("update current online users", currentUsers);
-};
-
 io.on("connection", function(socket) {
   socket.on("chat message", function(userInput) {
     var message =
       userInput.time + " " + userInput.username + ": " + userInput.message;
-    io.emit("chat message", message);
+    io.emit("chat message", { color: userInput.color, message: message });
   });
 });
 
