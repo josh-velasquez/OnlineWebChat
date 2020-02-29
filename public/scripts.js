@@ -19,18 +19,28 @@ $(function() {
   });
 
   socket.on("new user connection", function(newUser) {
+    liveUser = newUser;
     var li = '<li style="font-weight: bold; text-align: center; color: red">';
     $("#messages").append(
       $(li).text("New user joined the chat: " + newUser.username)
     );
   });
 
-  // ###############################################
+  const newMessage = data => {
+    socket.emit("chat message", {
+      username: liveUser.username,
+      color: liveUser.color,
+      time: getCurrentTime(),
+      message: data
+    });
+  };
 
   socket.on("chat message", function(msg) {
     var li = '<li style="color: rgb' + msg.color + ';">';
     $("#messages").append($(li).text(msg.message));
   });
+
+  // ###############################################
 
   socket.on("update current online users", function(users) {
     $("#users").empty();
@@ -71,14 +81,5 @@ $(function() {
     var li = '<li style="font-weight: bold; text-align: center;">';
     $("#messages").append($(li).text(message));
     liveUser.color = newColor;
-  };
-
-  const newMessage = data => {
-    socket.emit("chat message", {
-      username: liveUser.username,
-      color: liveUser.color,
-      time: getCurrentTime(),
-      message: data
-    });
   };
 });
