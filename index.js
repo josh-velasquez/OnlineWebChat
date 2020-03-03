@@ -13,18 +13,20 @@ var numUsers = 0;
 
 io.on("connection", function(socket) {
   console.log("a user connected");
-  newUserConnection();
+  newUserConnectionNotification(socket);
   socket.on("disconnect", function() {
     console.log("user disconnected");
     updateCurrentOnlineUsers();
   });
 });
 
-const newUserConnection = () => {
+const newUserConnectionNotification = socket => {
   numUsers += 1;
-  var newUser = { username: "User" + numUsers, color: "(255, 255, 255)" };
+  var assignedName = "User" + numUsers;
+  var newUser = { username: assignedName, color: "(255, 255, 255)" };
   currentUsers.push(newUser);
   io.emit("new user connection", newUser);
+  socket.emit("show user name", { username: assignedName });
   updateCurrentOnlineUsers();
 };
 
@@ -58,8 +60,9 @@ io.on("connection", function(socket) {
 });
 
 io.on("connection", function(socket) {
-  socket.on("change username", function(data) {
+  io.on("change username", function(data) {
     updateUserName(data.username, data.newusername);
+    // io.emit("username change approved", { newName: data.newusername });
     updateCurrentOnlineUsers();
   });
 });
