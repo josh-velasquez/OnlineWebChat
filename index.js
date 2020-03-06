@@ -14,11 +14,17 @@ var numUsers = 0;
 io.on("connection", function(socket) {
   console.log("a user connected");
   newUserConnectionNotification(socket);
+  updateMessages(socket);
   socket.on("disconnect", function() {
     console.log("user disconnected");
     updateCurrentOnlineUsers();
   });
 });
+
+const getCurrentTime = () => {
+  var today = new Date();
+  return today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+};
 
 const newUserConnectionNotification = socket => {
   numUsers += 1;
@@ -36,12 +42,18 @@ const updateCurrentOnlineUsers = () => {
 
 // ###############################################
 
+const updateMessages = socket => {
+  socket.emit("show all messages", { messages: messages });
+};
+
 const updateUserName = (currentUsername, newName) => {
   for (var i = 0; i < currentUsers.length; i++) {
     if (currentUsers[i].username == currentUsername) {
       currentUsers[i].username = newName;
     }
   }
+
+  // UPDATE THE MESSAGES TOO
 };
 
 const updateUserColor = (username, newColor) => {
@@ -50,6 +62,8 @@ const updateUserColor = (username, newColor) => {
       currentUsers[i].color = newColor;
     }
   }
+
+  // UPDATE THE MESSAGES TOO
 };
 
 io.on("connection", function(socket) {
@@ -60,20 +74,35 @@ io.on("connection", function(socket) {
 });
 
 io.on("connection", function(socket) {
-  io.on("change username", function(data) {
+  socket.on("change username", function(data) {
     updateUserName(data.username, data.newusername);
-    // io.emit("username change approved", { newName: data.newusername });
+    io.emit("change username approved global", {
+      username: data.username,
+      newusername: data.newusername
+    });
+    socket.emit("show updated user name", data.newusername);
     updateCurrentOnlineUsers();
   });
 });
 
 io.on("connection", function(socket) {
   socket.on("chat message", function(userInput) {
-    var message =
-      userInput.time + " " + userInput.username + ": " + userInput.message;
-    io.emit("chat message", { color: userInput.color, message: message });
+    var newInput = { ...userInput, time: getCurrentTime() };
+    io.emit("chat global message", newInput);
+    socket.emit("chat message", newInput);
+    addNewMessage(newInput);
   });
 });
+
+const addNewMessage = userInput => {
+  var newMessage = {
+    username: userInput.username,
+    time: userInput.time,
+    message: userInput.message,
+    color: userInput.color
+  };
+  messages.push(newMessage);
+};
 
 server.listen(port, () => {
   console.log("Server listening at port %d", port);

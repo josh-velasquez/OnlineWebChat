@@ -98,3 +98,12 @@ form button {
 .online-users li {
   padding-top: 10px;
 }
+
+#username-header {
+  padding: 10px 10px;
+  display: inline-flex;
+  flex-direction: row;
+  color: beige;
+  width: 80%;
+  height: 50px;
+}
