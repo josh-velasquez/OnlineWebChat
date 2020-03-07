@@ -64,6 +64,11 @@ $(function() {
     $("#messages").append($(li).text(message));
   });
 
+  socket.on("update all messages color", function(messages) {
+    $("#messages").empty();
+    showAllMessages(messages);
+  });
+
   socket.on("update current online users", function(users) {
     $("#users").empty();
     let li;
@@ -90,22 +95,24 @@ $(function() {
   });
 
   socket.on("show all messages", function(messages) {
+    showAllMessages(messages.messages);
+  });
+
+  const showAllMessages = messages => {
     let li;
     let text;
-    for (var i = 0; i < messages.messages.length; i++) {
+    for (var i = 0; i < messages.length; i++) {
       li =
-        '<li style="color: rgb' +
-        messages.messages[i].color +
-        ';font-style: italic;">';
+        '<li style="color: rgb' + messages[i].color + ';font-style: italic;">';
       text =
-        messages.messages[i].time +
+        messages[i].time +
         " " +
-        messages.messages[i].username +
+        messages[i].username +
         ": " +
-        messages.messages[i].message;
+        messages[i].message;
       $("#messages").append($(li).text(text));
     }
-  });
+  };
 
   socket.on("show updated user name", function(name) {
     liveUser.username = name;

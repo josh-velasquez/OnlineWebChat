@@ -13,10 +13,12 @@ var numUsers = 0;
 
 io.on("connection", function(socket) {
   console.log("a user connected");
+  numUsers += 1;
   newUserConnectionNotification(socket);
   updateMessages(socket);
   socket.on("disconnect", function() {
     console.log("user disconnected");
+    numUsers -= 1;
     updateCurrentOnlineUsers();
   });
 });
@@ -27,7 +29,6 @@ const getCurrentTime = () => {
 };
 
 const newUserConnectionNotification = socket => {
-  numUsers += 1;
   var assignedName = "User" + numUsers;
   var newUser = { username: assignedName, color: "(255, 255, 255)" };
   currentUsers.push(newUser);
@@ -70,8 +71,19 @@ io.on("connection", function(socket) {
   socket.on("change user color", function(data) {
     updateUserColor(data.username, data.newcolor);
     updateCurrentOnlineUsers();
+    updateAllMessagesColor(data);
   });
 });
+
+const updateAllMessagesColor = newData => {
+  for (var i = 0; i < messages.length; i++) {
+    if (messages[i].username == newData.username) {
+      messages[i].color = newData.newcolor;
+    }
+  }
+  io.emit("update all messages color", messages);
+  console.log("EMITTED")
+};
 
 io.on("connection", function(socket) {
   socket.on("change username", function(data) {
