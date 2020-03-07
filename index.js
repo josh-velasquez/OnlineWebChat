@@ -41,20 +41,22 @@ const updateCurrentOnlineUsers = () => {
   io.emit("update current online users", currentUsers);
 };
 
-// ###############################################
-
 const updateMessages = socket => {
   socket.emit("show all messages", { messages: messages });
 };
 
 const updateUserName = (currentUsername, newName) => {
   for (var i = 0; i < currentUsers.length; i++) {
-    if (currentUsers[i].username == currentUsername) {
-      currentUsers[i].username = newName;
+    if (currentUsers[i].username == newName) {
+      return false;
     }
   }
-
-  // UPDATE THE MESSAGES TOO
+  for (var i = 0; i < currentUsers.length; i++) {
+    if (currentUsers[i].username == currentUsername) {
+      currentUsers[i].username = newName;
+      return true;
+    }
+  }
 };
 
 const updateUserColor = (username, newColor) => {
@@ -63,8 +65,6 @@ const updateUserColor = (username, newColor) => {
       currentUsers[i].color = newColor;
     }
   }
-
-  // UPDATE THE MESSAGES TOO
 };
 
 io.on("connection", function(socket) {
@@ -82,18 +82,20 @@ const updateAllMessagesColor = newData => {
     }
   }
   io.emit("update all messages color", messages);
-  console.log("EMITTED")
 };
 
 io.on("connection", function(socket) {
   socket.on("change username", function(data) {
-    updateUserName(data.username, data.newusername);
-    io.emit("change username approved global", {
-      username: data.username,
-      newusername: data.newusername
-    });
-    socket.emit("show updated user name", data.newusername);
-    updateCurrentOnlineUsers();
+    if (updateUserName(data.username, data.newusername)) {
+      io.emit("change username approved global", {
+        username: data.username,
+        newusername: data.newusername
+      });
+      socket.emit("show updated username", {changed: true, newUsername: data.newusername});
+      updateCurrentOnlineUsers();
+    } else {
+      socket.emit("show updated username", {changed: false})
+    }
   });
 });
 

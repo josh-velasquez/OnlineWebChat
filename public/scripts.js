@@ -7,11 +7,18 @@ $(function() {
 
   $("form").submit(function(e) {
     e.preventDefault();
-    var input = $("#m").val();
+    var input = $("#m")
+      .val()
+      .trim();
     if (input.includes("/nick ")) {
       changeUserName(input);
     } else if (input.includes("/nickcolor ")) {
       changeUserColor(input);
+    } else if (input.split(" ")[0].includes("/")) {
+      var li = '<li style="font-weight: bold; text-align: center; color: red">';
+      $("#messages").append(
+        $(li).text(">>          Invalid command.          <<")
+      );
     } else {
       newMessage(input);
     }
@@ -19,21 +26,68 @@ $(function() {
     return false;
   });
 
+  const getUsernameCookie = () => {
+    var value = "; " + document.cookie;
+    var parts = value.split("; username=");
+    if (parts.length == 2)
+      return parts
+        .pop()
+        .split(";")
+        .shift();
+  };
+
+  // Saving cookie (expires in an hour)
+  const saveUsernameCookie = username => {
+    var now = new Date();
+    now.setTime(now.getTime() + 1 * 3600 * 1000);
+    document.cookie =
+      "username=" +
+      username +
+      "; expires=" +
+      now.toUTCString() +
+      ";" +
+      " path=/";
+  };
+
   // Shows to that a new connection is made
   socket.on("new user connection", function(newUser) {
-    var li = '<li style="font-weight: bold; text-align: center; color: white">';
-    $("#messages").append(
-      $(li).text("New user joined the chat: " + newUser.username)
-    );
+    var oldUser = getUsernameCookie();
+    if (oldUser == null) {
+      var li =
+        '<li style="font-weight: bold; text-align: center; color: white">';
+      $("#messages").append(
+        $(li).text("New user joined the chat: " + newUser.username)
+      );
+      saveUsernameCookie(newUser.username);
+    } else {
+      var li =
+        '<li style="font-weight: bold; text-align: center; color: white">';
+      $("#messages").append($(li).text("User reconnected: " + oldUser));
+    }
   });
 
   // Shows the connected users name
   socket.on("show user name", function(newUser) {
-    liveUser = newUser;
-    var li = '<li style="font-weight: bold; text-align: center; color: white">';
-    $("#messages").append($(li).text("You are " + newUser.username));
-    var p = '<p style="padding: 3px; margin-top: 3px;">';
-    $("#username-header").append($(p).text(newUser.username));
+    var oldUser = getUsernameCookie();
+    if (oldUser == null) {
+      liveUser = newUser;
+      var li =
+        '<li style="font-weight: bold; text-align: center; color: white">';
+      $("#messages").append($(li).text("You are " + newUser.username));
+      $("#username").empty();
+      var p = '<h3 style="padding: 3px; margin-top: 3px;">';
+      $("#username").append($(p).text("You are: " + newUser.username));
+    } else {
+      liveUser = { username: oldUser };
+      var li =
+        '<li style="font-weight: bold; text-align: center; color: white">';
+      $("#messages").append($(li).text("You are " + oldUser));
+      $("#username").empty();
+      var p = '<h3 style="padding: 3px; margin-top: 3px;">';
+      $("#username").append(
+        $(p).text("You have reconnected. You are: " + oldUser)
+      );
+    }
   });
 
   const newMessage = data => {
@@ -53,8 +107,6 @@ $(function() {
       $("#messages").append($(li).text(message));
     }
   });
-
-  // ###############################################
 
   socket.on("chat message", function(userInput) {
     var li =
@@ -84,7 +136,6 @@ $(function() {
       username: liveUser.username,
       newusername: newName
     });
-    liveUser.username = name.newName;
   };
 
   socket.on("change username approved global", function(user) {
@@ -102,8 +153,15 @@ $(function() {
     let li;
     let text;
     for (var i = 0; i < messages.length; i++) {
-      li =
-        '<li style="color: rgb' + messages[i].color + ';font-style: italic;">';
+      if (messages[i].username == liveUser.username) {
+        li =
+          '<li style="color: rgb' + messages[i].color + ';font-weight: bold;">';
+      } else {
+        li =
+          '<li style="color: rgb' +
+          messages[i].color +
+          ';font-style: italic;">';
+      }
       text =
         messages[i].time +
         " " +
@@ -114,10 +172,26 @@ $(function() {
     }
   };
 
-  socket.on("show updated user name", function(name) {
-    liveUser.username = name;
-    var li = '<li style="font-weight: bold; text-align: center; color: white">';
-    $("#messages").append($(li).text("Name updated. You are " + name));
+  socket.on("show updated username", function(data) {
+    if (!data.changed) {
+      var li = '<li style="font-weight: bold; text-align: center; color: red">';
+      $("#messages").append(
+        $(li).text(
+          " >>      Name is taken. Please select another name.      <<"
+        )
+      );
+      $("#username").empty();
+    } else {
+      liveUser.username = data.newUsername;
+      var li =
+        '<li style="font-weight: bold; text-align: center; color: white">';
+      $("#messages").append(
+        $(li).text("Name updated. You are " + data.newUsername)
+      );
+      $("#username").empty();
+      var p = '<h3 style="padding: 3px; margin-top: 3px;">';
+      $("#username").append($(p).text("You are: " + data.newUsername));
+    }
   });
 
   const changeUserColor = data => {
