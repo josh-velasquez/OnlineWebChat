@@ -39,7 +39,7 @@ $(function() {
   // Saving cookie (expires in an hour)
   const saveUsernameCookie = username => {
     var now = new Date();
-    now.setTime(now.getTime() + 1 * 3600 * 1000);
+    now.setTime(now.getTime() + 1 * 60 * 1000); // 5 minute cookie
     document.cookie =
       "username=" +
       username +
@@ -49,44 +49,46 @@ $(function() {
       " path=/";
   };
 
-  // Shows to that a new connection is made
-  socket.on("new user connection", function(newUser) {
-    var oldUser = getUsernameCookie();
-    if (oldUser == null) {
+  socket.on("username reconnected", function(data) {
+    if (data.reconnected && liveUser != null) {
+      liveUser = data.user;
       var li =
         '<li style="font-weight: bold; text-align: center; color: white">';
       $("#messages").append(
-        $(li).text("New user joined the chat: " + newUser.username)
+        $(li).text("User reconnected: " + liveUser.username)
       );
-      saveUsernameCookie(newUser.username);
+      saveUsernameCookie(liveUser.username);
     } else {
       var li =
         '<li style="font-weight: bold; text-align: center; color: white">';
-      $("#messages").append($(li).text("User reconnected: " + oldUser));
+      $("#messages").append(
+        $(li).text("New user joined the chat: " + data.user.username)
+      );
+      saveUsernameCookie(data.user.username);
     }
   });
 
-  // Shows the connected users name
-  socket.on("show user name", function(newUser) {
+  // Shows to that a new connection is made
+  socket.on("new user connection", function(newUser) {
     var oldUser = getUsernameCookie();
-    if (oldUser == null) {
-      liveUser = newUser;
+    // Send the username to server to see if it exists
+    socket.emit("check username reconnection", {
+      newUser: newUser,
+      oldUser: oldUser
+    });
+  });
+
+  // Shows the connected users name
+  socket.on("show username", function(newUser) {
+    if (liveUser.username != newUser.username) {
       var li =
         '<li style="font-weight: bold; text-align: center; color: white">';
       $("#messages").append($(li).text("You are " + newUser.username));
       $("#username").empty();
       var p = '<h3 style="padding: 3px; margin-top: 3px;">';
       $("#username").append($(p).text("You are: " + newUser.username));
-    } else {
-      liveUser = { username: oldUser };
-      var li =
-        '<li style="font-weight: bold; text-align: center; color: white">';
-      $("#messages").append($(li).text("You are " + oldUser));
-      $("#username").empty();
-      var p = '<h3 style="padding: 3px; margin-top: 3px;">';
-      $("#username").append(
-        $(p).text("You have reconnected. You are: " + oldUser)
-      );
+      liveUser = { username: newUser.username };
+      saveUsernameCookie(liveUser.username);
     }
   });
 
@@ -191,6 +193,7 @@ $(function() {
       $("#username").empty();
       var p = '<h3 style="padding: 3px; margin-top: 3px;">';
       $("#username").append($(p).text("You are: " + data.newUsername));
+      saveUsernameCookie(data.newUsername);
     }
   });
 

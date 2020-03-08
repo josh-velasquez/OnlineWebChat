@@ -33,9 +33,29 @@ const newUserConnectionNotification = socket => {
   var newUser = { username: assignedName, color: "(255, 255, 255)" };
   currentUsers.push(newUser);
   io.emit("new user connection", newUser);
-  socket.emit("show user name", { username: assignedName });
   updateCurrentOnlineUsers();
 };
+
+io.on("connection", function(socket) {
+  socket.on("check username reconnection", function(user) {
+    for (var i = 0; i < currentUsers.length; i++) {
+      if (currentUsers[i].username == user.oldUser) {
+        socket.emit("username reconnected", {
+          reconnected: true,
+          user: currentUsers[i]
+        });
+        socket.emit("show username", { username: currentUsers[i].username });
+        return;
+      }
+    }
+    // create new user
+    socket.emit("username reconnected", {
+      reconnected: false,
+      user: user.newUser
+    });
+    socket.emit("show username", { username: user.newUser.username });
+  });
+});
 
 const updateCurrentOnlineUsers = () => {
   io.emit("update current online users", currentUsers);
@@ -91,10 +111,13 @@ io.on("connection", function(socket) {
         username: data.username,
         newusername: data.newusername
       });
-      socket.emit("show updated username", {changed: true, newUsername: data.newusername});
+      socket.emit("show updated username", {
+        changed: true,
+        newUsername: data.newusername
+      });
       updateCurrentOnlineUsers();
     } else {
-      socket.emit("show updated username", {changed: false})
+      socket.emit("show updated username", { changed: false });
     }
   });
 });

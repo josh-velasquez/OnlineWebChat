@@ -5,6 +5,7 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
+    <div class="title-head">Online Web Chat</div>
     <div class="chat">
       <div id="username-header">
         <div id="username"></div>
@@ -12,14 +13,16 @@
       <div id="chat-box">
         <ul id="messages"></ul>
       </div>
-    </div>
-    <form action="">
-      <input id="m" autocomplete="off" /><button>Send</button>
-    </form>
-    <div class="online-users">
-      <h1>Online Users</h1>
-      <div id="users-list">
-        <ul id="users"></ul>
+      <div>
+        <form action="">
+          <input id="m" autocomplete="off" /><button>Send</button>
+        </form>
+      </div>
+      <div class="online-users">
+        <h1>Online Users</h1>
+        <div id="users-list">
+          <ul id="users"></ul>
+        </div>
       </div>
     </div>
     <script src="/socket.io/socket.io.js"></script>
