@@ -91,18 +91,18 @@ io.on("connection", function(socket) {
   socket.on("change user color", function(data) {
     updateUserColor(data.username, data.newcolor);
     updateCurrentOnlineUsers();
-    updateAllMessagesColor(data);
+    // updateAllMessagesColor(data);
   });
 });
 
-const updateAllMessagesColor = newData => {
-  for (var i = 0; i < messages.length; i++) {
-    if (messages[i].username == newData.username) {
-      messages[i].color = newData.newcolor;
-    }
-  }
-  io.emit("update all messages color", messages);
-};
+// const updateAllMessagesColor = newData => {
+//   for (var i = 0; i < messages.length; i++) {
+//     if (messages[i].username == newData.username) {
+//       messages[i].color = newData.newcolor;
+//     }
+//   }
+//   io.emit("update all messages color", messages);
+// };
 
 io.on("connection", function(socket) {
   socket.on("change username", function(data) {

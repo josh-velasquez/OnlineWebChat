@@ -3,9 +3,10 @@ $(function() {
   var liveUser = { username: "", color: "" };
 
   // Keeps the window scrolled to the bottom
-  // $("#chat").scrollTop($("#chat-box")[0].scrollHeight);
+  // $("#chat-content").scrollTop($("#messages")[0].scrollHeight);
 
-  sendMessage = () => {
+  $("#chat-input").submit(function(e) {
+    e.preventDefault();
     var input = document.getElementById("message").value.trim();
     if (input.includes("/nick ")) {
       changeUserName(input);
@@ -20,7 +21,8 @@ $(function() {
       newMessage(input);
     }
     $("#message").val("");
-  };
+    return true;
+  });
 
   const getUsernameCookie = () => {
     var value = "; " + document.cookie;
@@ -46,7 +48,7 @@ $(function() {
   };
 
   socket.on("username reconnected", function(data) {
-    if (data.reconnected && liveUser != null) {
+    if (data.reconnected) {
       liveUser = data.user;
       var li =
         '<li style="font-weight: bold; text-align: center; color: white">';
@@ -76,13 +78,12 @@ $(function() {
 
   // Shows the connected users name
   socket.on("show username", function(newUser) {
+    var li = '<li style="font-weight: bold; text-align: center; color: white">';
+    $("#messages").append($(li).text("You are " + newUser.username));
+    $("#username").empty();
+    var p = '<h3 style="padding: 3px; margin-top: 3px;">';
+    $("#username").append($(p).text("You are: " + newUser.username));
     if (liveUser.username != newUser.username) {
-      var li =
-        '<li style="font-weight: bold; text-align: center; color: white">';
-      $("#messages").append($(li).text("You are " + newUser.username));
-      $("#username").empty();
-      var p = '<h3 style="padding: 3px; margin-top: 3px;">';
-      $("#username").append($(p).text("You are: " + newUser.username));
       liveUser = { username: newUser.username };
       saveUsernameCookie(liveUser.username);
     }
@@ -114,10 +115,10 @@ $(function() {
     $("#messages").append($(li).text(message));
   });
 
-  socket.on("update all messages color", function(messages) {
-    $("#messages").empty();
-    showAllMessages(messages);
-  });
+  // socket.on("update all messages color", function(messages) {
+  //   $("#messages").empty();
+  //   showAllMessages(messages);
+  // });
 
   socket.on("update current online users", function(users) {
     $("#users").empty();
