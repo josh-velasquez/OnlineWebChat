@@ -89,18 +89,9 @@ body {
 
 .chat {
   display: flex;
-  flex-flow: row;
+  flex-flow: column;
   height: 100%;
 }
-/* 
-#chat-box {
-  overflow: auto;
-  position: absolute;
-  bottom: 0;
-  width: 80%;
-  margin-bottom: 40px;
-  flex: 1 1 auto;
-} */
 
 .online-users {
   background-color: #f58a07;
