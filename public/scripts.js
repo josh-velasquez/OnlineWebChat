@@ -3,13 +3,10 @@ $(function() {
   var liveUser = { username: "", color: "" };
 
   // Keeps the window scrolled to the bottom
-  $("#chat").scrollTop($("#chat-box")[0].scrollHeight);
+  // $("#chat").scrollTop($("#chat-box")[0].scrollHeight);
 
-  $("form").submit(function(e) {
-    e.preventDefault();
-    var input = $("#m")
-      .val()
-      .trim();
+  sendMessage = () => {
+    var input = document.getElementById("message").value.trim();
     if (input.includes("/nick ")) {
       changeUserName(input);
     } else if (input.includes("/nickcolor ")) {
@@ -22,9 +19,8 @@ $(function() {
     } else {
       newMessage(input);
     }
-    $("#m").val("");
-    return false;
-  });
+    $("#message").val("");
+  };
 
   const getUsernameCookie = () => {
     var value = "; " + document.cookie;

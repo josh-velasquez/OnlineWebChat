@@ -1,58 +1,71 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+/* https://coolors.co/2b2d42-7cacc0-bde0eb-f58a07-015a79 */
+html,
 body {
+  height: 100%;
+  margin: 0;
   font: 13px Helvetica, Arial;
-  background-color: rgb(59, 59, 59);
+  background-color: #2b2d42;
+}
+.box {
   display: flex;
-  flex-direction: row;
+  flex-flow: column;
+  height: 100%;
 }
-form {
-  padding: 3px;
-  position: fixed;
-  bottom: 0;
+
+.box .row.header {
+  flex: 0 1 auto;
+}
+
+.box .row.content {
+  flex: 1 1 auto;
+  overflow-y: scroll;
+}
+
+.box .row.footer {
+  flex: 0 1 40px;
+}
+.username-header {
+  padding: 10px 10px;
+  color: beige;
+  height: 20px;
+  background-color: #7cacc0;
+}
+
+.input-form {
+  width: 100%;
+  justify-content: center;
+}
+
+.input-form input {
   width: 80%;
+  height: 20px;
+  padding: 5px 5px;
+  margin: 10px 5px;
+  border-radius: 10px;
+  background-color: #4e447a;
+  color: white;
 }
-form input {
-  border: 0;
-  color: whitesmoke;
-  padding: 10px;
-  width: 90%;
-  margin-right: 0.5%;
-  border-radius: 5px;
-  background-color: rgb(85, 85, 85);
-  padding-bottom: 5px;
-  height: 30px;
+
+.input-form button {
+  padding: 5px 5px;
+  width: 15%;
+  height: 35px;
+  border-radius: 10px;
+  background-color: #c22320;
 }
-form button {
-  width: 8.5%;
-  background: rgb(129, 50, 50);
-  border: none;
-  padding: 8px;
-  border-radius: 5px;
-  height: 30px;
-  margin-bottom: 10px;
-  color: whitesmoke;
-}
+
 #messages {
   list-style-type: none;
   margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
   width: 100%;
   padding: 0;
 }
 #messages li {
   padding: 5px 10px;
-  color: white;
   height: 30px;
   border-radius: 3px;
 }
-#messages li:nth-child(odd) {
-  background: rgb(126, 126, 126);
-  color: black;
-}
-
 
 #users {
   list-style-type: none;
@@ -60,53 +73,47 @@ form button {
   padding-top: 20px;
   text-align: center;
 }
-/* .chat {
-  overflow: none;
-  position: relative;
-  width: 80%;
-  height: 800px;
-} */
 
 .title-head {
   height: 50px;
   color: white;
   display: flex;
-  background-color: darkblue;
+  background-color: #015a79;
   justify-content: center;
+  padding-top: 20px;
 }
 
-body {
-  height: 100%;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
+.title-head h2 {
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 .chat {
   display: flex;
-  flex-flow: column;
-  width: 80%;
+  flex-flow: row;
   height: 100%;
 }
-
+/* 
 #chat-box {
   overflow: auto;
-  position: fixed;
+  position: absolute;
   bottom: 0;
   width: 80%;
   margin-bottom: 40px;
-  display: flex;
-  flex-wrap: wrap;
-}
+  flex: 1 1 auto;
+} */
 
 .online-users {
-  background-color: rgb(49, 49, 49);
+  background-color: #f58a07;
   padding: 3px;
   position: absolute;
   right: 0;
-  height: 100%;
   width: 20%;
+  height: 95%;
   border-radius: 3px;
+}
+
+.online-users h1 {
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 #users-list {
@@ -125,6 +132,7 @@ body {
 
 .online-users li {
   padding-top: 10px;
+  position: relative;
 }
 
 #username-header {
