@@ -14,7 +14,7 @@ var numUsers = 0;
 io.on("connection", function(socket) {
   console.log("a user connected");
   numUsers += 1;
-  newUserConnectionNotification(socket);
+  getBrowserCookie(socket);
   updateMessages(socket);
   socket.on("disconnect", function() {
     console.log("user disconnected");
@@ -28,32 +28,29 @@ const getCurrentTime = () => {
   return today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
 };
 
-const newUserConnectionNotification = socket => {
-  var assignedName = "User" + numUsers;
-  var newUser = { username: assignedName, color: "(255, 255, 255)" };
-  currentUsers.push(newUser);
-  io.emit("new user connection", newUser);
-  updateCurrentOnlineUsers();
+const getBrowserCookie = socket => {
+  socket.emit("get browser cookie");
 };
 
 io.on("connection", function(socket) {
-  socket.on("check username reconnection", function(user) {
+  socket.on("send browser cookie", function(username) {
     for (var i = 0; i < currentUsers.length; i++) {
-      if (currentUsers[i].username == user.oldUser) {
-        socket.emit("username reconnected", {
-          reconnected: true,
-          user: currentUsers[i]
-        });
+      if (currentUsers[i].username == username) {
+        io.emit("username reconnected", { username: username });
         socket.emit("show username", { username: currentUsers[i].username });
+        updateCurrentOnlineUsers();
         return;
       }
     }
-    // create new user
-    socket.emit("username reconnected", {
-      reconnected: false,
-      user: user.newUser
+    // Create new connection
+    var newUsername = "User" + numUsers;
+    var addUser = { username: newUsername, color: "(255, 255, 255)" };
+    currentUsers.push(addUser);
+    io.emit("username not reconnected", {
+      username: newUsername
     });
-    socket.emit("show username", { username: user.newUser.username });
+    socket.emit("show username", { username: newUsername });
+    updateCurrentOnlineUsers();
   });
 });
 
@@ -91,18 +88,8 @@ io.on("connection", function(socket) {
   socket.on("change user color", function(data) {
     updateUserColor(data.username, data.newcolor);
     updateCurrentOnlineUsers();
-    // updateAllMessagesColor(data);
   });
 });
-
-// const updateAllMessagesColor = newData => {
-//   for (var i = 0; i < messages.length; i++) {
-//     if (messages[i].username == newData.username) {
-//       messages[i].color = newData.newcolor;
-//     }
-//   }
-//   io.emit("update all messages color", messages);
-// };
 
 io.on("connection", function(socket) {
   socket.on("change username", function(data) {

@@ -8,17 +8,18 @@ body {
   flex-flow: column;
   height: 100%;
   width: 80%;
+  overflow: hidden;
 }
 
 .chat-container .chat-header {
   flex: 0 1 auto;
-  background-color: #631d76;
+  background-color: #5bc0be;
 }
 
 .chat-container .chat-content {
   flex: 1 1 auto;
-  background-color: #2e2532;
-  overflow-y: auto;
+  background-color: #1c2541;
+  overflow: auto;
   scrollbar-color: black;
 }
 
@@ -31,14 +32,19 @@ body {
 .title-head {
   color: white;
   display: flex;
-  background-color: #201a23;
+  background-color: #0b132b;
   justify-content: center;
   padding-top: 20px;
-  height: 10%;
+  height: 85px;
 }
 
-.title-head h2 {
+.online-users-header {
+  flex: 0 1 auto;
+}
+
+.title-head h3 {
   font-family: Arial, Helvetica, sans-serif;
+  font-weight: bold;
   color: #fbfbfb;
 }
 .username-header {
@@ -54,9 +60,9 @@ body {
 }
 
 .online-users {
-  background-color: #9e4770;
-  padding: 3px;
+  background-color: #3a506b;
   width: 20%;
+  margin: 0;
   height: 100%;
 }
 
@@ -64,29 +70,32 @@ body {
   font-family: Arial, Helvetica, sans-serif;
   color: whitesmoke;
   text-align: center;
-  padding-top: 10px;
+}
+.break {
+  width: 80%;
+  margin: 10px auto;
+  border-color: white;
 }
 
 #users-list {
-  overflow: auto;
-  position: absolute;
-  bottom: 0;
   padding: 10px 20px;
   margin-bottom: 20px;
+  overflow-y: auto;
+  scrollbar-color: black;
 }
 
 #users {
-  list-style-type: none;
+  list-style: none;
   color: aliceblue;
   text-align: left;
 }
 
 #messages {
-  list-style-type: none;
+  list-style: none;
   margin: 0;
   font-family: Arial, Helvetica, sans-serif;
-  width: 100%;
   padding: 0;
+  overflow-y: auto;
 }
 
 #messages li {

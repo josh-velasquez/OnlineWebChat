@@ -3,7 +3,7 @@ $(function() {
   var liveUser = { username: "", color: "" };
 
   // Keeps the window scrolled to the bottom
-  // $("#chat-content").scrollTop($("#messages")[0].scrollHeight);
+  $("#messages").scrollTop($("#messages")[0].scrollHeight);
 
   $("#chat-input").submit(function(e) {
     e.preventDefault();
@@ -22,6 +22,10 @@ $(function() {
     }
     $("#message").val("");
     return true;
+  });
+
+  socket.on("get browser cookie", function() {
+    socket.emit("send browser cookie", getUsernameCookie());
   });
 
   const getUsernameCookie = () => {
@@ -48,22 +52,15 @@ $(function() {
   };
 
   socket.on("username reconnected", function(data) {
-    if (data.reconnected) {
-      liveUser = data.user;
-      var li =
-        '<li style="font-weight: bold; text-align: center; color: white">';
-      $("#messages").append(
-        $(li).text("User reconnected: " + liveUser.username)
-      );
-      saveUsernameCookie(liveUser.username);
-    } else {
-      var li =
-        '<li style="font-weight: bold; text-align: center; color: white">';
-      $("#messages").append(
-        $(li).text("New user joined the chat: " + data.user.username)
-      );
-      saveUsernameCookie(data.user.username);
-    }
+    var li = '<li style="font-weight: bold; text-align: center; color: white">';
+    $("#messages").append($(li).text("User reconnected: " + data.username));
+  });
+
+  socket.on("username not reconnected", function(newUser) {
+    var li = '<li style="font-weight: bold; text-align: center; color: white">';
+    $("#messages").append(
+      $(li).text("New user joined the chat: " + newUser.username)
+    );
   });
 
   // Shows to that a new connection is made
@@ -77,16 +74,14 @@ $(function() {
   });
 
   // Shows the connected users name
-  socket.on("show username", function(newUser) {
+  socket.on("show username", function(user) {
     var li = '<li style="font-weight: bold; text-align: center; color: white">';
-    $("#messages").append($(li).text("You are " + newUser.username));
+    $("#messages").append($(li).text("You are " + user.username));
     $("#username").empty();
-    var p = '<h3 style="padding: 3px; margin-top: 3px;">';
-    $("#username").append($(p).text("You are: " + newUser.username));
-    if (liveUser.username != newUser.username) {
-      liveUser = { username: newUser.username };
-      saveUsernameCookie(liveUser.username);
-    }
+    var p = '<h4 style="padding: 3px; margin-top: 3px;">';
+    $("#username").append($(p).text("You are: " + user.username));
+    liveUser = { username: user.username };
+    saveUsernameCookie(liveUser.username);
   });
 
   const newMessage = data => {
@@ -114,11 +109,6 @@ $(function() {
       userInput.time + " " + userInput.username + ": " + userInput.message;
     $("#messages").append($(li).text(message));
   });
-
-  // socket.on("update all messages color", function(messages) {
-  //   $("#messages").empty();
-  //   showAllMessages(messages);
-  // });
 
   socket.on("update current online users", function(users) {
     $("#users").empty();
