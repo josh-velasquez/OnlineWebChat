@@ -18,7 +18,6 @@ io.on("connection", function(socket) {
   updateMessages(socket);
   socket.on("disconnect", function() {
     console.log("user disconnected");
-    numUsers -= 1;
     updateCurrentOnlineUsers();
   });
 });

@@ -3,7 +3,7 @@ $(function() {
   var liveUser = { username: "", color: "" };
 
   // Keeps the window scrolled to the bottom
-  $("#messages").scrollTop($("#messages")[0].scrollHeight);
+  $("#message-content").scrollTop($("#message-content")[0].scrollHeight);
 
   $("#chat-input").submit(function(e) {
     e.preventDefault();
@@ -38,10 +38,9 @@ $(function() {
         .shift();
   };
 
-  // Saving cookie (expires in an hour)
   const saveUsernameCookie = username => {
     var now = new Date();
-    now.setTime(now.getTime() + 1 * 60 * 1000); // 5 minute cookie
+    now.setTime(now.getTime() + 5 * 60 * 1000); // 5 minute cookie
     document.cookie =
       "username=" +
       username +
@@ -108,13 +107,14 @@ $(function() {
     var message =
       userInput.time + " " + userInput.username + ": " + userInput.message;
     $("#messages").append($(li).text(message));
+    $("#message-content").scrollTop($("#message-content")[0].scrollHeight);
   });
 
   socket.on("update current online users", function(users) {
     $("#users").empty();
     let li;
     for (var i = 0; i < users.length; i++) {
-      li = '<li style="color: rgb' + users[i].color + ';">';
+      li = '<li style="color: rgb' + users[i].color + '; font-size: medium;">';
       $("#users").append($(li).text(users[i].username));
     }
   });

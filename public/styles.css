@@ -8,7 +8,6 @@ body {
   flex-flow: column;
   height: 100%;
   width: 80%;
-  overflow: hidden;
 }
 
 .chat-container .chat-header {
@@ -19,8 +18,7 @@ body {
 .chat-container .chat-content {
   flex: 1 1 auto;
   background-color: #1c2541;
-  overflow: auto;
-  scrollbar-color: black;
+  overflow-y: auto;
 }
 
 .chat-container .chat-footer {
